@@ -1,215 +1,569 @@
 # Breadit
+
 ### RootLayout setup
+
 - On [./src/app/layout.tsx]
-    - Here we havae our metadata which is what will appear on search results
-    - We use the inter font fron next fonts and apply it to our html togethe with the other tailwind classes e.g. antialised
-    ```tsx
-    import { Navbar } from '@/components/Navbar';
-    import { Toaster } from '@/components/ui/toaster';
-    import { cn } from '@/lib/utils';
-    // the cn function is a helér that allow us to combine various class together using tailwindmerge and conditionally using clsx
-    import '@/styles/globals.css';
-    import { Inter } from 'next/font/google';
 
-    export const metadata = {
-      title: 'Breadit',
-      description: 'A Reddit clone built with Next.js and TypeScript.',
-    }
+  - Here we havae our metadata which is what will appear on search results
+  - We use the inter font fron next fonts and apply it to our html togethe with the other tailwind classes e.g. antialised
 
-    const inter = Inter({ subsets: ['latin']});
+  ```tsx
+  import { Navbar } from '@/components/Navbar';
+  import { Toaster } from '@/components/ui/toaster';
+  import { cn } from '@/lib/utils';
+  // the cn function is a helér that allow us to combine various class together using tailwindmerge and conditionally using clsx
+  import '@/styles/globals.css';
+  import { Inter } from 'next/font/google';
 
-    export default function RootLayout({
-      children,
-    }: {
-      children: React.ReactNode
-    }) {
-      return (
-        <html lang='en' className={cn('bg=white text-slate-900 antialiased light', inter.className)}>
-          <body className='min-h-screen pt-12 bg-slate-50 antialiased'>
-             <Navbar />
+  export const metadata = {
+    title: 'Breadit',
+    description: 'A Reddit clone built with Next.js and TypeScript.',
+  };
 
-            <div className='container max-w-7xl mx-auto h-full pt-12'>
-              {children}
-            </div>
-            <Toaster/>
-          </body>
-        </html>
-      )
-    }
-    ```
+  const inter = Inter({ subsets: ['latin'] });
+
+  export default function RootLayout({
+    children,
+  }: {
+    children: React.ReactNode;
+  }) {
+    return (
+      <html
+        lang="en"
+        className={cn(
+          'bg=white text-slate-900 antialiased light',
+          inter.className
+        )}
+      >
+        <body className="min-h-screen pt-12 bg-slate-50 antialiased">
+          <Navbar />
+
+          <div className="container max-w-7xl mx-auto h-full pt-12">
+            {children}
+          </div>
+          <Toaster />
+        </body>
+      </html>
+    );
+  }
+  ```
+
 ### Applying shadcdn element style into another
+
 - With shadcn we can apply, for exmaple, a button style into a Link by importing its variant into the Link classname:
-    ```tsx
-    <Link href="/sign-in" className={buttonVariants()}>Sign In</Link>
-    ```
+  ```tsx
+  <Link href="/sign-in" className={buttonVariants()}>
+    Sign In
+  </Link>
+  ```
+
 ### Meging classes
+
 - On utils we created a cn utility function which help us combine multiple classnames together
+
 ```tsx
-    import { type ClassValue, clsx } from "clsx"
-    import { twMerge } from "tailwind-merge"
-     
-    export function cn(...inputs: ClassValue[]) {
-      return twMerge(clsx(inputs))
-    }
+import { type ClassValue, clsx } from 'clsx';
+import { twMerge } from 'tailwind-merge';
 
+export function cn(...inputs: ClassValue[]) {
+  return twMerge(clsx(inputs));
+}
 ```
+
 ### UserAuthForm
-- On [./src/components/UserAuthForm.tsx] 
-    - We create a client component where our logig with google client logic is done
-    - Our toast component and hook are taken from shadcn, to use it we added our Toaster to our RootLayout and invoked it here.
-    ```tsx
-    'use client';
-    import { FC, useState } from 'react';
-    import { Button } from './ui/Button';
-    import { cn } from '@/lib/utils'
-    import { signIn } from 'next-auth/react'
-    import { Icons } from './Icons';
-    import { useToast } from '@/hooks/use-toast';
 
-    interface UserAuthFormProps extends React.HTMLAttributes<HTMLDivElement>{};
+- On [./src/components/UserAuthForm.tsx]
 
-    const UserAuthForm: FC<UserAuthFormProps> = ({ className, ...props }) => {
-      const [isLoading, setIsLoading] = useState(false);
-      const { toast  } = useToast() 
+  - We create a client component where our logig with google client logic is done
+  - Our toast component and hook are taken from shadcn, to use it we added our Toaster to our RootLayout and invoked it here.
 
-      const loginWithGoogle = async () => {
-        setIsLoading(true)
+  ```tsx
+  'use client';
+  import { FC, useState } from 'react';
+  import { Button } from './ui/Button';
+  import { cn } from '@/lib/utils';
+  import { signIn } from 'next-auth/react';
+  import { Icons } from './Icons';
+  import { useToast } from '@/hooks/use-toast';
 
-        try {
-          await signIn('google');
-        } catch (err) {
-          toast({
-            title: "There was a problem",
-            description: "Error while trying to login with google",
-            variant: "destructive"
-          })
-          
-        } finally {
-          setIsLoading(false);
-        }
+  interface UserAuthFormProps extends React.HTMLAttributes<HTMLDivElement> {}
+
+  const UserAuthForm: FC<UserAuthFormProps> = ({ className, ...props }) => {
+    const [isLoading, setIsLoading] = useState(false);
+    const { toast } = useToast();
+
+    const loginWithGoogle = async () => {
+      setIsLoading(true);
+
+      try {
+        await signIn('google');
+      } catch (err) {
+        toast({
+          title: 'There was a problem',
+          description: 'Error while trying to login with google',
+          variant: 'destructive',
+        });
+      } finally {
+        setIsLoading(false);
       }
+    };
 
-      return (
-        <div className={cn('flex, justify-center', className)} {...props}>
-          <Button size="sm" className="w-full" onClick={loginWithGoogle} isLoading={isLoading}>
-          {isLoading ? null : <Icons.google className="w-4 h-4 mr-2"/>}
-            Google
-          </Button>
-        </div>
-      )
-    }
+    return (
+      <div className={cn('flex, justify-center', className)} {...props}>
+        <Button
+          size="sm"
+          className="w-full"
+          onClick={loginWithGoogle}
+          isLoading={isLoading}
+        >
+          {isLoading ? null : <Icons.google className="w-4 h-4 mr-2" />}
+          Google
+        </Button>
+      </div>
+    );
+  };
 
-    export default UserAuthForm; 
+  export default UserAuthForm;
+  ```
 
-    ```
 ### Authentication
+
 - To make our authentication we created a [./src/app/api/auth/[...nextauth]/route.ts]
-    - Here we simply create a handler for our nextauth make both our get anad post auth routs available.
-    ```tsx
-    import NextAuth from "next-auth/next";
-    import { authOptions } from "@/lib/auth";
 
-    const handler = NextAuth(authOptions)
+  - Here we simply create a handler for our nextauth make both our get anad post auth routs available.
 
-    export {handler as GET, handler as POST}
-    ```
+  ```tsx
+  import NextAuth from 'next-auth/next';
+  import { authOptions } from '@/lib/auth';
+
+  const handler = NextAuth(authOptions);
+
+  export { handler as GET, handler as POST };
+  ```
+
 - And for our [./src/lib/auth.ts]
-    - Here wee configure our authhOptions lib passing our db, strategy, and google credentials.
-    - We also create callbacks function, session will take our google data and pass it to our token.
-    - JWT is w
-    ```tsx
-    //because we're preparaing a library to be used in our applicaiton
-    import { NextAuthOptions } from "next-auth";
-    import { db } from "./db";
-    import { PrismaAdapter } from '@next-auth/prisma-adapter';
-    import  GoogleProvider from 'next-auth/providers/google';
-    import { nanoid } from 'nanoid';
 
-    export const authOptions: NextAuthOptions = {
-      adapter: PrismaAdapter(db),
-      session: {
-        strategy: 'jwt'
+  - Here wee configure our authhOptions lib passing our db, strategy, and google credentials.
+  - We also create callbacks function, session will take our google data and pass it to our token.
+  - JWT is w
+
+  ```tsx
+  //because we're preparaing a library to be used in our applicaiton
+  import { NextAuthOptions } from 'next-auth';
+  import { db } from './db';
+  import { PrismaAdapter } from '@next-auth/prisma-adapter';
+  import GoogleProvider from 'next-auth/providers/google';
+  import { nanoid } from 'nanoid';
+
+  export const authOptions: NextAuthOptions = {
+    adapter: PrismaAdapter(db),
+    session: {
+      strategy: 'jwt',
+    },
+    pages: {
+      signIn: '/sign-in',
+    },
+    providers: [
+      GoogleProvider({
+        clientId: process.env.GOOGLE_CLIENT_ID!,
+        clientSecret: process.env.GOOGLE_CLIENT_SECRET!,
+      }),
+    ],
+    callbacks: {
+      async session({ token, session }) {
+        if (token) {
+          session.user.id = token.id;
+          session.user.name = token.name;
+          session.user.email = token.email;
+          session.user.image = token.picture;
+          session.user.username = token.username;
+        }
       },
-      pages: {
-        signIn: '/sign-in'
-      },
-      providers: [
-        GoogleProvider({
-          clientId: process.env.GOOGLE_CLIENT_ID!,
-          clientSecret: process.env.GOOGLE_CLIENT_SECRET!,
-        })
-      ],
-      callbacks: {
-        async session({ token, session }) {
-          if(token) {
-            session.user.id = token.id;
-            session.user.name = token.name;
-            session.user.email = token.email;
-            session.user.image  = token.picture;
-            session.user.username = token.username;
-          }
-        },
-        async jwt({ token, user}) {
-          const dbUser = await db.user.findFirst({
+      async jwt({ token, user }) {
+        const dbUser = await db.user.findFirst({
+          where: {
+            email: token.email,
+          },
+        });
+
+        if (!dbUser) {
+          token.id = user!.id;
+          return token;
+        }
+
+        if (!dbUser.username) {
+          await db.user.update({
             where: {
-              email: token.email,
-            }
+              id: dbUser.id,
+            },
+            data: {
+              username: nanoid(10),
+            },
           });
-          
-          if(!dbUser){
-            token.id = user!.id
-            return token
-          }
-
-          if(!dbUser.username){
-            await db.user.update({
-              where: {
-                id: dbUser.id
-              },
-              data: {
-                username: nanoid(10),
-              }
-            })
-          }
-
-          return {
-            id: dbUser.id,
-            name: dbUser.name,
-            emai: dbUser.email,
-            picture: dbUser.image,
-            username: dbUser.username,
-          }
-        }, 
-        redirect () {
-          return '/'
         }
+
+        return {
+          id: dbUser.id,
+          name: dbUser.name,
+          emai: dbUser.email,
+          picture: dbUser.image,
+          username: dbUser.username,
+        };
       },
-    }
-    ```
+      redirect() {
+        return '/';
+      },
+    },
+  };
+  ```
+
 - On [./src/types/next-auth.d.ts]:
-    -  Here we declare or jwt and next-auth with the inclusion of our usename and id.
-    ```tsx
-    import type { Session, User } from 'next-auth';
-    import type  { JWT } from 'next-auth/jwt';
 
-    type UserId = string;
+  - Here we declare or jwt and next-auth with the inclusion of our usename and id.
 
-    declare module 'next-auth/jwt' {
-      interface JWT {
-        id: UserId,
-        username?: string | null
-      }
+  ```tsx
+  import type { Session, User } from 'next-auth';
+  import type { JWT } from 'next-auth/jwt';
+
+  type UserId = string;
+
+  declare module 'next-auth/jwt' {
+    interface JWT {
+      id: UserId;
+      username?: string | null;
+    }
+  }
+
+  declare module 'next-auth' {
+    interface Session {
+      user: User & {
+        id: UserId;
+        username?: string | null;
+      };
+    }
+  }
+  ```
+
+### UseraccountNav
+
+- On [./src/components/UserAccountNav.tsx]:
+
+  - Using shadcn DropDownMenu component we create our user menu, which has:
+    1. A trigger, which is our UserAvatar
+    2. Content, where our user data is available
+    3. A separator
+    4. Ou action links/buttons
+
+  ```tsx
+  const UserAccountNav: FC<UserAccountNavProps> = ({ user }) => {
+    const handleSignOut = (e: Event) => {
+      e.preventDefault();
+      signOut({
+        callbackUrl: `${window.location.origin}/sign-in`,
+      });
+    };
+
+    return (
+      <DropdownMenu>
+        <DropdownMenuTrigger>
+          <UserAvatar
+            user={{
+              name: user.name || null,
+              image: user.image || null,
+            }}
+            className="h-8 w-8"
+          />
+        </DropdownMenuTrigger>
+
+        <DropdownMenuContent className="bg-white" align="end">
+          <div className="flex items-center justify-start gap-2 p-2">
+            <div className="flex flex-col space-y-1 leading-none">
+              {user.name && <p className="font-medium">{user.name}</p>}
+              {user.email ? (
+                <p className="w-[200px] truncate text-sm text-zinc-700">
+                  {user.email}
+                </p>
+              ) : (
+                <p className="w-[200px] truncate text-sm text-zinc-700">
+                  email@teste.com
+                </p>
+              )}
+            </div>
+          </div>
+          <DropdownMenuSeparator />
+
+          <DropdownMenuItem asChild>
+            <Link href="/">Feed</Link>
+          </DropdownMenuItem>
+
+          <DropdownMenuItem asChild>
+            <Link href="/r/create">Create community</Link>
+          </DropdownMenuItem>
+
+          <DropdownMenuItem asChild>
+            <Link href="settings">Settings</Link>
+          </DropdownMenuItem>
+
+          <DropdownMenuItem className="cursor-pointer" onSelect={handleSignOut}>
+            Sign out
+          </DropdownMenuItem>
+        </DropdownMenuContent>
+      </DropdownMenu>
+    );
+  };
+  ```
+
+### Perfecting the authentication flow
+
+- Our authentications routes, when clicked will first open a modal, and will only redirect to a page when refreshed. To do that we have an `@componentName/(.)route-which-is--redirected`.
+- On [./src/app/@authModal/default.tsx] we return null to say by default it won't redirect.
+- On [./src/app/@authModal/(.)sign-in/page.tsx]:
+
+  - We create a modal component.
+  - `CloseModal` is simply a button which return to the previous route.
+  - We do tha same to `/(.)sign-up`
+
+  ```tsx
+  const page: FC<PageProps> = ({}) => {
+    return (
+      <div className="fixed inset-0 bg-zinc-900/20 z-10">
+        <div className="container flex items-center h-full maax-w-lg mx-auto">
+          <div className="relative bg-white w-full h-fit py-20 px-2 rounded-lg">
+            <div className="absolute top-4 right-4">
+              <CloseModal />
+            </div>
+            <SignIn />
+          </div>
+        </div>
+      </div>
+    );
+  };
+
+  export default page;
+  ```
+
+### Database Modeling
+
+- On [./prisma/schema.prisma] we create our tables: Subreddits, Posts, Comments, Votes and sub-tables to support them.
+
+  - On the model comment we have the following relation between one comment and another comments.
+  - We can break the @relation statement into:
+    1. It's name(optinal)
+    2. The field in the table that do the relation.
+    3. The field it references on the other tablea.
+    4. The actions the DB do when the comment it is related to is deleted, in this case since they're on the same table, it mustn't do anything.
+  - replayTo and repalyToId here are optional since not all commeents are a reply to another.
+  - replies is an array of comments, it is a one to many relationship
+
+    ```prisma
+    model Comment {
+      id        String   @id @default(cuid())
+      replyToId String?
+      replyTo   Comment?  @relation("ReplyTo", fields: [replyToId], references: [id], onDelete: NoAction, onUpdate: NoAction)
+      replies   Comment[] @relation("ReplyTo")
     }
 
-    declare module 'next-auth' {
-      interface Session {
-        user: User & {
-          id: UserId,
-          username?: string | null
+    ```
+
+- Here another example not between an user and a subreddit and a user and a subscription:
+  - Here we can better understand relationships in Prisma.
+  - First we have the relationship between User and Subreddit, where our subreddit is related to our user based on tis id. And likewise on user we have a Subscription[] to point out it can have many of them created.
+  - Subscription is how we create many-to-many relationships. On Subscription we relate user and subreddit referencing their Id and creating a relation to the respective fields.
+
+```prisma
+    model User {
+      id            String    @id @default(cuid())
+      name          String?
+      email         String?   @unique
+      emailVerified DateTime?
+
+      username String? @unique
+
+      image        String?
+      createdSubreddits Subreddit[] @relation("CreatedBy")
+      accounts     Account[]
+      sessions     Session[]
+      Post         Post[]
+      Comment      Comment[]
+      CommentVote  CommentVote[]
+      Vote         Vote[]
+      Subscription Subscription[]
+    }
+
+    model Subreddit {
+      id        String   @id @default(cuid())
+      name      String   @unique
+      createdAt DateTime @default(now())
+      updatedAt DateTime @updatedAt
+      posts     Post[]
+
+      creatorId String?
+      Creator   User?   @relation("CreatedBy", fields: [creatorId], references: [id])
+
+      subscriber Subscription[]
+
+      @@index([name])
+    }
+
+    model Subscription {
+      user        User      @relation(fields: [userId], references: [id])
+      userId      String
+      subreddit   Subreddit @relation(fields: [subredditId], references: [id])
+      subredditId String
+
+      @@id([userId, subredditId])
+    }
+```
+
+### Creaating a subreddit and error handling
+
+- On [./src/app/r/create/page.tsx]:
+
+  - With useMutation from react query we send our data (name) to our api and receive back its response.
+  - We then treat our axioserrors based on their http code, or show a generic toast if it doesnt match any of them.
+
+  ```tsx
+  const { mutate: createCommunity, isLoading } = useMutation({
+    mutationFn: async () => {
+      const payload: CreateSubredditPayload = { name: input };
+
+      const { data } = await axios.post('/api/subreddit', payload);
+      return data as string;
+    },
+    onError: (err) => {
+      if (err instanceof AxiosError) {
+        if (err.response?.status === 400) {
+          return toast({
+            title: 'Subreddit already exits',
+            description: 'Please choose a different name',
+            variant: 'destructive',
+          });
+        }
+
+        if (err.response?.status === 422) {
+          return toast({
+            title: 'Invalid subreddit name',
+            description: 'Please choose a name between 3 and 21 characters.',
+            variant: 'destructive',
+          });
+        }
+
+        if (err.response?.status === 401) {
+          return loginToast();
         }
       }
+
+      toast({
+        title: 'There was an error',
+        description: 'Could not create subreddit.',
+        variant: 'destructive',
+      });
+    },
+    onSuccess: (data) => router.push(`/r/${data}`),
+  });
+  ```
+
+- To toasts which will be commonly show we create a hook called useCustomToast:
+
+```tsx
+import Link from 'next/link';
+import { toast } from './use-toast';
+import { buttonVariants } from '@/components/ui/Button';
+
+export const useCustomToast = () => {
+  const loginToast = () => {
+    const { dismiss } = toast({
+      title: 'Login required.',
+      description: 'You need to be logged in to do that.',
+      variant: 'destructive',
+      action: (
+        <Link
+          href="sign-in"
+          onClick={() => dismiss()}
+          className={buttonVariants({ variant: 'outline' })}
+        >
+          Login
+        </Link>
+      ),
+    });
+  };
+
+  return { loginToast };
+};
+```
+
+- API to create a subreddit:
+
+  - Our POST route will make the due validations on the serve-side and if everything is ok return our response. In case it is not we returnr our status code.
+
+  ```tsx
+  import { getAuthSession } from '@/lib/auth';
+  import { db } from '@/lib/db';
+  import { SubredditValidator } from '@/lib/validators/subreddit';
+  import { z } from 'zod';
+
+  export async function POST(req: Request) {
+    try {
+      const session = await getAuthSession();
+
+      if (!session?.user) {
+        return new Response('Unauthorized', { status: 401 });
+      }
+
+      const body = await req.json();
+      const { name } = SubredditValidator.parse(body);
+
+      const subredditExists = await db.subreddit.findFirst({
+        where: {
+          name,
+        },
+      });
+
+      if (subredditExists) {
+        return new Response('Subreddit already exists', { status: 409 });
+      }
+
+      const subreddit = await db.subreddit.create({
+        data: {
+          name,
+          creatorId: session.user.id,
+        },
+      });
+
+      await db.subscription.create({
+        data: {
+          userId: session.user.id,
+          subredditId: subreddit.id,
+        },
+      });
+
+      return new Response(subreddit.name);
+    } catch (err) {
+      if (err instanceof z.ZodError) {
+        return new Response(err.message, { status: 422 });
+      }
+      return new Response('Could not create subreddit', { status: 500 });
     }
+  }
+  ```
 
-    ```
+- To make it all typesafe we create a [./src/lib/validators/subreddit.ts]:
 
+  ```tsx
+  import { z } from 'zod';
 
+  export const SubredditValidator = z.object({
+    name: z.string().min(3).max(21),
+  });
+
+  export const SubredditSubscriptionValidator = z.object({
+    subredditId: z.string(),
+  });
+
+  export type CreateSubredditPayload = z.infer<typeof SubredditValidator>;
+  export type SubscribeToSubredditPaloyad = z.infer<
+    typeof SubredditSubscriptionValidator
+  >;
+  ```
+
+-`<dd>` provides the description/definition a term `<dt>` in a description list `<dl>`

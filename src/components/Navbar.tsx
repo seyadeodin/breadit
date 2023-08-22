@@ -1,8 +1,8 @@
-import Link from "next/link";
-import { Icons } from "./Icons";
-import { buttonVariants } from "./ui/Button";
-import { getAuthSession } from "@/lib/auth";
-import UserAccountNav from "./UserAccountNav";
+import Link from 'next/link';
+import { Icons } from './Icons';
+import { buttonVariants } from './ui/Button';
+import { getAuthSession } from '@/lib/auth';
+import UserAccountNav from './UserAccountNav';
 
 export async function Navbar() {
   const session = await getAuthSession();
@@ -13,19 +13,21 @@ export async function Navbar() {
         {/* logo */}
         <Link href="/" className="flex gap-2 items-center">
           <Icons.logo className="h-8 w-8 sm:h-6 sm:w-6" />
-          <p className="hidden text-zinc-700 test-sm font-medium md:block">Breadit</p>
+          <p className="hidden text-zinc-700 test-sm font-medium md:block">
+            Breadit
+          </p>
         </Link>
 
         {/* search bar */}
 
-        {
-          session?.user
-            ? <UserAccountNav user={session.user} />
-            : <Link href="/sign-in" className={buttonVariants()}>Sign In</Link>
-        }
-
-
+        {session?.user ? (
+          <UserAccountNav user={session.user} />
+        ) : (
+          <Link href="/sign-in" className={buttonVariants()}>
+            Sign In
+          </Link>
+        )}
       </div>
     </div>
-  )
+  );
 }
