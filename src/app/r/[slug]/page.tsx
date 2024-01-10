@@ -27,9 +27,11 @@ const page = async ({ params }: pageProps) => {
           subreddit: true,
         },
         take: INIFINITE_SCROLLING_PAGINATION_RESULTS,
+        orderBy: { createdAt: 'desc' },
       },
     },
   });
+  console.log('LS -> src/app/r/[slug]/page.tsx:33 -> subreddit: ', subreddit);
 
   if (!subreddit) return notFound();
 

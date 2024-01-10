@@ -10,8 +10,8 @@ const formatDistanceLocale = {
   lessThanXSeconds: 'just now',
   xSeconds: 'just now',
   halfAMinute: 'just now',
-  lessThanXMinutes: '{{count}}m',
-  xMinutes: '{{count}}m',
+  lessThanXMinutes: '{{count}}min',
+  xMinutes: '{{count}}min',
   aboutXHours: '{{count}}h',
   xHours: '{{count}}h',
   xDays: '{{count}}d',
@@ -45,7 +45,7 @@ function formatDistance(token: string, count: number, options?: any): string {
 }
 
 export function formatTimeToNow(date: Date): string {
-  return formatDistanceToNowStrict(date, {
+  return formatDistanceToNowStrict(new Date(date), {
     addSuffix: true,
     locale: {
       ...locale,

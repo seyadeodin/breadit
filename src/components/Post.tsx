@@ -4,6 +4,10 @@ import { FC, useRef } from 'react';
 import { formatTimeToNow } from '@/lib/utils';
 import Link from 'next/link';
 import { MessageSquare } from 'lucide-react';
+import EditorOutput from './ui/EditorOutput';
+import PostVoteClient from './post-vote/PostVoteClient';
+
+type PartialVote = Pick<Vote, 'type'>;
 
 interface PostProps {
   subredditName: string;
@@ -12,14 +16,26 @@ interface PostProps {
     votes: Vote[];
   };
   commentAmt: number;
+  votesAmt: number;
+  currentVote?: PartialVote;
 }
 
-const Post: FC<PostProps> = ({ subredditName, post, commentAmt }) => {
+const Post: FC<PostProps> = ({
+  subredditName,
+  post,
+  commentAmt,
+  votesAmt,
+  currentVote,
+}) => {
   const pRef = useRef<HTMLDivElement | null>(null);
   return (
     <div className="rounded-md bg-white shadow">
       <div className="px-6 py-4 flex justify-between">
-        {/* TODO: PostVotes */}
+        <PostVoteClient
+          initialVotesAmt={votesAmt}
+          initialVote={currentVote?.type}
+          postId={post.id}
+        />
 
         <div className="w-0 flex-1">
           <div className="max-h-40 mt-1 text-sm text-gray-500">
@@ -32,9 +48,7 @@ const Post: FC<PostProps> = ({ subredditName, post, commentAmt }) => {
                   r/{subredditName}
                 </a>
                 <span className="px-1">•</span>
-                <span className="px-1">
-                  Posted by u/{post.author.name}
-                </span>{' '}
+                <span className="px-1">Posted by u/{post.author.name}</span>
                 {formatTimeToNow(post.createdAt)}
               </>
             )}
@@ -49,6 +63,7 @@ const Post: FC<PostProps> = ({ subredditName, post, commentAmt }) => {
             className="relative text-sm max-h-40 w-full overflow-clip"
             ref={pRef}
           >
+            <EditorOutput content={post.content} />
             {pRef.current?.clientHeight === 160 ? (
               <div className="absolute bottom-0 left-0 h-24 w-full bg-gradient-to-t from-white to-transparent"></div>
             ) : null}

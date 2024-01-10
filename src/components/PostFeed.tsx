@@ -1,6 +1,6 @@
 'use client';
 import { ExtendedPost } from '@/types/db';
-import { FC, useRef } from 'react';
+import { FC, useEffect, useRef } from 'react';
 import { useIntersection } from '@mantine/hooks';
 import { useInfiniteQuery } from '@tanstack/react-query';
 import { INIFINITE_SCROLLING_PAGINATION_RESULTS } from '@/config';
@@ -30,7 +30,7 @@ const PostFeed: FC<PostFeedProps> = ({
     async ({ pageParam = 1 }) => {
       const query =
         `/api/posts?limit=${INIFINITE_SCROLLING_PAGINATION_RESULTS}&page=${pageParam}` +
-        (!!subredditName ? `subredditName=${subredditName}` : '');
+        (!!subredditName ? `&subredditName=${subredditName}` : '');
 
       const { data } = await axios.get(query);
       return data as ExtendedPost[];
@@ -42,6 +42,12 @@ const PostFeed: FC<PostFeedProps> = ({
       initialData: { pages: [initialPosts], pageParams: [1] },
     }
   );
+
+  useEffect(() => {
+    if (entry?.isIntersecting) {
+      fetchNextPage();
+    }
+  }, [entry, fetchNextPage]);
 
   const posts = data?.pages.flatMap((page) => page) ?? initialPosts;
 
@@ -58,13 +64,15 @@ const PostFeed: FC<PostFeedProps> = ({
           (vote) => vote.userId === session?.user.id
         );
 
-        if (index === posts.length - -1) {
+        if (index === posts.length - 1) {
           return (
             <li key={post.id} ref={ref}>
               <Post
                 subredditName={post.subreddit.name}
                 post={post}
                 commentAmt={post.comments.length}
+                currentVote={currentVote}
+                votesAmt={votesAmt}
               />
             </li>
           );
@@ -74,6 +82,8 @@ const PostFeed: FC<PostFeedProps> = ({
             subredditName={post.subreddit.name}
             post={post}
             commentAmt={post.comments.length}
+            currentVote={currentVote}
+            votesAmt={votesAmt}
           />
         );
       })}
