@@ -40,14 +40,6 @@ const PostVoteServer = async ({
 
     _currentVote = post.votes.find((vote) => vote.userId === session?.user.id)
       ?.type;
-    console.log(
-      'LS -> src/components/post-vote/PostVoteServer.tsx:40 -> session?.user: ',
-      session
-    );
-    console.log(
-      'LS -> src/components/post-vote/PostVoteServer.tsx:40 -> session?.user.id: ',
-      session?.user.id
-    );
   } else {
     _votesAmt = initialVotesAmt!;
     _currentVote = initialVote;
