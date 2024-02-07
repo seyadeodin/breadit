@@ -48,7 +48,7 @@ const Post: FC<PostProps> = ({
                   r/{subredditName}
                 </a>
                 <span className="px-1">•</span>
-                <span className="px-1">Posted by u/{post.author.name}</span>
+                <span className="px-1">Posted by u/{post.author.username}</span>
                 {formatTimeToNow(post.createdAt)}
               </>
             )}
